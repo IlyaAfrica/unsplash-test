@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { OAuthContext } from '../../contexts/OAuthContext';
 
 const ACCES_KEY = process.env.REACT_APP_ACCES_KEY;
 const SECRET_KEY = process.env.REACT_APP_SECRET_KEY;
@@ -10,31 +11,43 @@ const client = {
   grant_type: 'authorization_code',
 };
 
-export const OAuth = (props) => {
-  const [token, setToken] = useState();
+const OAuth = ({setToken}) => {
+  const [code, setCode] = useState();
 
   useEffect(() => {
-    setToken(window.location.search.split('=')[1]);
+    setCode(window.location.search.split('=')[1]);
   }, []);
 
   const fetchPostAPI = async () => {
     const response = await axios.post(
-      `https://unsplash.com/oauth/token?client_id=${client.client_id}&client_secret=${client.client_secret}&redirect_uri=${client.redirect_uri}&code=${token}&grant_type=${client.grant_type}`
+      `https://unsplash.com/oauth/token?client_id=${client.client_id}&client_secret=${client.client_secret}&redirect_uri=${client.redirect_uri}&code=${code}&grant_type=${client.grant_type}`
     );
     console.log(response);
     const data = await response.data;
-    console.log();
-    props.onSuccesRequest(data.acces_token);
+    console.log(setToken);
+    setToken(data)
   };
   //   useEffect(() => {
   //     fetchPostAPI();
   //   }, []);
 
-  console.log(token);
+  console.log(code);
   return (
     <div>
-      <h2>{token}</h2>
+      <h2>{code}</h2>
       <button onClick={fetchPostAPI}>click me</button>
     </div>
   );
 };
+const WithOAuthContext = () => {
+  return (
+    <OAuthContext.Consumer>
+      {(value) => {
+        return <OAuth {...value} />;
+      }}
+    </OAuthContext.Consumer>
+  );
+};
+
+
+export {WithOAuthContext as OAuth}

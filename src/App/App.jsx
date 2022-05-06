@@ -4,9 +4,10 @@ import './App.css';
 import { Content } from '../components/content';
 import { LogIn } from '../components/LogIn';
 import { OAuth } from '../components/OAuth';
+import { OAuthContext } from '../contexts/OAuthContext';
 
 export const App = () => {
-  // const [token, setToken] = useState();
+  const [token, setToken] = React.useState(undefined);
   // useEffect(() => {
   //   setToken();
   // }, []);
@@ -19,25 +20,18 @@ export const App = () => {
       </header>
     );
   }
+  console.log(token);
   return (
-    <div>
-      {renderLinks()}
+    <OAuthContext.Provider value={{ token, setToken }}>
+      <div>
+        {renderLinks()}
 
-      <Routes>
-        <Route path='/content' element={<Content />} />
-        <Route path='/' element={<LogIn />} />
-        <Route
-          path='/oauth'
-          render={(...props) => (
-            <OAuth
-              {...props}
-              onSuccesRequest={(token) => {
-                console.log(token);
-              }}
-            />
-          )}
-        />
-      </Routes>
-    </div>
+        <Routes>
+          <Route path='/content' element={<Content />} />
+          <Route path='/' element={<LogIn />} />
+          <Route path='/oauth' element={<OAuth />} />
+        </Routes>
+      </div>
+    </OAuthContext.Provider>
   );
 };
